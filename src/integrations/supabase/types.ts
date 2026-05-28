@@ -18,6 +18,8 @@ export type Database = {
         Row: {
           category: string
           created_at: string
+          details: Json
+          details_complete: boolean
           document_url: string | null
           expiry_date: string
           id: string
@@ -31,6 +33,8 @@ export type Database = {
         Insert: {
           category: string
           created_at?: string
+          details?: Json
+          details_complete?: boolean
           document_url?: string | null
           expiry_date: string
           id?: string
@@ -44,6 +48,8 @@ export type Database = {
         Update: {
           category?: string
           created_at?: string
+          details?: Json
+          details_complete?: boolean
           document_url?: string | null
           expiry_date?: string
           id?: string
