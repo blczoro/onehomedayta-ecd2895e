@@ -77,7 +77,7 @@ function EditItemPage() {
           category,
           expiry_date: expiryDate,
           reminder_days: Number(reminderDays) || 7,
-          details,
+          details: details as never,
           details_complete: completeness.percent === 100,
         })
         .eq("id", id);
