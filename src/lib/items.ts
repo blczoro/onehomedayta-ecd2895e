@@ -42,3 +42,156 @@ export const statusLabel: Record<Status, string> = {
   soon: "Expiring soon",
   active: "Active",
 };
+
+// ---------- Category-specific detail fields ----------
+
+export type DetailFieldType = "text" | "date" | "number" | "boolean" | "textarea" | "file";
+
+export interface DetailField {
+  key: string;
+  label: string;
+  type: DetailFieldType;
+}
+
+export interface DetailSection {
+  title: string;
+  fields: DetailField[];
+}
+
+export const DETAIL_SECTIONS: Record<string, DetailSection[]> = {
+  Electronics: [
+    {
+      title: "Product",
+      fields: [
+        { key: "brand", label: "Brand name", type: "text" },
+        { key: "model", label: "Model number", type: "text" },
+        { key: "serial", label: "Serial number", type: "text" },
+      ],
+    },
+    {
+      title: "Warranty",
+      fields: [
+        { key: "purchase_date", label: "Purchase date", type: "date" },
+        { key: "warranty_start", label: "Warranty start date", type: "date" },
+        { key: "warranty_end", label: "Warranty expiry date", type: "date" },
+        { key: "seller", label: "Seller / store name", type: "text" },
+      ],
+    },
+    {
+      title: "Documents & notes",
+      fields: [
+        { key: "invoice", label: "Invoice upload", type: "file" },
+        { key: "notes", label: "Notes", type: "textarea" },
+      ],
+    },
+  ],
+  Furniture: [
+    {
+      title: "Item",
+      fields: [
+        { key: "material", label: "Material type", type: "text" },
+        { key: "brand", label: "Brand / store", type: "text" },
+        { key: "purchase_date", label: "Purchase date", type: "date" },
+      ],
+    },
+    {
+      title: "Warranty & documents",
+      fields: [
+        { key: "warranty_details", label: "Warranty details", type: "textarea" },
+        { key: "invoice", label: "Invoice upload", type: "file" },
+        { key: "notes", label: "Notes", type: "textarea" },
+      ],
+    },
+  ],
+  Insurance: [
+    {
+      title: "Policy",
+      fields: [
+        { key: "policy_number", label: "Policy number", type: "text" },
+        { key: "company", label: "Insurance company", type: "text" },
+        { key: "premium", label: "Premium amount", type: "number" },
+        { key: "renewal_date", label: "Renewal date", type: "date" },
+      ],
+    },
+    {
+      title: "Documents",
+      fields: [
+        { key: "policy_document", label: "Policy document upload", type: "file" },
+        { key: "notes", label: "Notes", type: "textarea" },
+      ],
+    },
+  ],
+  Vehicle: [
+    {
+      title: "Vehicle",
+      fields: [
+        { key: "registration", label: "Registration number", type: "text" },
+        { key: "insurance_expiry", label: "Insurance expiry", type: "date" },
+        { key: "puc_expiry", label: "PUC expiry", type: "date" },
+        { key: "service_date", label: "Service reminder date", type: "date" },
+      ],
+    },
+    {
+      title: "Documents",
+      fields: [
+        { key: "rc", label: "RC upload", type: "file" },
+        { key: "insurance_document", label: "Insurance document upload", type: "file" },
+        { key: "notes", label: "Notes", type: "textarea" },
+      ],
+    },
+  ],
+  Subscription: [
+    {
+      title: "Plan",
+      fields: [
+        { key: "plan", label: "Monthly / yearly plan", type: "text" },
+        { key: "renewal_date", label: "Renewal date", type: "date" },
+        { key: "amount", label: "Payment amount", type: "number" },
+        { key: "auto_renew", label: "Auto-renew enabled", type: "boolean" },
+      ],
+    },
+  ],
+  Appliance: [
+    {
+      title: "Appliance",
+      fields: [
+        { key: "brand", label: "Brand", type: "text" },
+        { key: "model", label: "Model", type: "text" },
+        { key: "purchase_date", label: "Purchase date", type: "date" },
+        { key: "warranty_end", label: "Warranty expiry date", type: "date" },
+        { key: "seller", label: "Seller / store", type: "text" },
+      ],
+    },
+    {
+      title: "Documents & notes",
+      fields: [
+        { key: "invoice", label: "Invoice upload", type: "file" },
+        { key: "notes", label: "Notes", type: "textarea" },
+      ],
+    },
+  ],
+  Other: [
+    {
+      title: "Details",
+      fields: [
+        { key: "notes", label: "Notes", type: "textarea" },
+      ],
+    },
+  ],
+};
+
+export function detailsCompleteness(
+  category: string,
+  details: Record<string, unknown> | null | undefined,
+): { filled: number; total: number; percent: number } {
+  const sections = DETAIL_SECTIONS[category] ?? DETAIL_SECTIONS.Other;
+  const fields = sections.flatMap((s) => s.fields);
+  const total = fields.length;
+  const d = details ?? {};
+  const filled = fields.filter((f) => {
+    const v = (d as Record<string, unknown>)[f.key];
+    if (f.type === "boolean") return v === true || v === false;
+    return v !== undefined && v !== null && String(v).trim() !== "";
+  }).length;
+  return { filled, total, percent: total === 0 ? 100 : Math.round((filled / total) * 100) };
+}
