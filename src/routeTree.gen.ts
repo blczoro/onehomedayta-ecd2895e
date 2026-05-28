@@ -18,6 +18,7 @@ import { Route as AuthenticatedRemindersRouteImport } from './routes/_authentica
 import { Route as AuthenticatedMyItemsRouteImport } from './routes/_authenticated/my-items'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedAddItemRouteImport } from './routes/_authenticated/add-item'
+import { Route as AuthenticatedItemsIdEditRouteImport } from './routes/_authenticated/items.$id.edit'
 
 const SignupRoute = SignupRouteImport.update({
   id: '/signup',
@@ -63,6 +64,12 @@ const AuthenticatedAddItemRoute = AuthenticatedAddItemRouteImport.update({
   path: '/add-item',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedItemsIdEditRoute =
+  AuthenticatedItemsIdEditRouteImport.update({
+    id: '/items/$id/edit',
+    path: '/items/$id/edit',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -73,6 +80,7 @@ export interface FileRoutesByFullPath {
   '/my-items': typeof AuthenticatedMyItemsRoute
   '/reminders': typeof AuthenticatedRemindersRoute
   '/settings': typeof AuthenticatedSettingsRoute
+  '/items/$id/edit': typeof AuthenticatedItemsIdEditRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -83,6 +91,7 @@ export interface FileRoutesByTo {
   '/my-items': typeof AuthenticatedMyItemsRoute
   '/reminders': typeof AuthenticatedRemindersRoute
   '/settings': typeof AuthenticatedSettingsRoute
+  '/items/$id/edit': typeof AuthenticatedItemsIdEditRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -95,6 +104,7 @@ export interface FileRoutesById {
   '/_authenticated/my-items': typeof AuthenticatedMyItemsRoute
   '/_authenticated/reminders': typeof AuthenticatedRemindersRoute
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
+  '/_authenticated/items/$id/edit': typeof AuthenticatedItemsIdEditRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -107,6 +117,7 @@ export interface FileRouteTypes {
     | '/my-items'
     | '/reminders'
     | '/settings'
+    | '/items/$id/edit'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -117,6 +128,7 @@ export interface FileRouteTypes {
     | '/my-items'
     | '/reminders'
     | '/settings'
+    | '/items/$id/edit'
   id:
     | '__root__'
     | '/'
@@ -128,6 +140,7 @@ export interface FileRouteTypes {
     | '/_authenticated/my-items'
     | '/_authenticated/reminders'
     | '/_authenticated/settings'
+    | '/_authenticated/items/$id/edit'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -202,6 +215,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAddItemRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/items/$id/edit': {
+      id: '/_authenticated/items/$id/edit'
+      path: '/items/$id/edit'
+      fullPath: '/items/$id/edit'
+      preLoaderRoute: typeof AuthenticatedItemsIdEditRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
   }
 }
 
@@ -211,6 +231,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedMyItemsRoute: typeof AuthenticatedMyItemsRoute
   AuthenticatedRemindersRoute: typeof AuthenticatedRemindersRoute
   AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
+  AuthenticatedItemsIdEditRoute: typeof AuthenticatedItemsIdEditRoute
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
@@ -219,6 +240,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedMyItemsRoute: AuthenticatedMyItemsRoute,
   AuthenticatedRemindersRoute: AuthenticatedRemindersRoute,
   AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
+  AuthenticatedItemsIdEditRoute: AuthenticatedItemsIdEditRoute,
 }
 
 const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
@@ -234,3 +256,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
