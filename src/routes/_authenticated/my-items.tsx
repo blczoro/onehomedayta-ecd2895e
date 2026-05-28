@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { CATEGORIES, daysUntil, statusOf, statusStyles, statusLabel } from "@/lib/items";
 import { format, parseISO } from "date-fns";
-import { Pencil, Trash2, Plus, Search } from "lucide-react";
+import { Pencil, Trash2, Plus, Search, AlertCircle } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -105,6 +105,13 @@ function MyItemsPage() {
                 </div>
                 <div className="mt-1 text-xs text-muted-foreground">Reminder: {item.reminder_days} day(s) before</div>
 
+                {!item.details_complete && (
+                  <div className="mt-3 flex items-center gap-2 rounded-md border border-warning/30 bg-warning/10 px-3 py-2 text-xs">
+                    <AlertCircle className="h-3.5 w-3.5 text-warning-foreground shrink-0" />
+                    <span className="text-warning-foreground">Missing details — add more for better reminders.</span>
+                  </div>
+                )}
+
                 {editing === item.id ? (
                   <div className="mt-3 flex gap-2">
                     <Input type="date" value={editExpiry} onChange={(e) => setEditExpiry(e.target.value)} />
@@ -112,13 +119,19 @@ function MyItemsPage() {
                     <Button size="sm" variant="ghost" onClick={() => setEditing(null)}>Cancel</Button>
                   </div>
                 ) : (
-                  <div className="mt-3 flex gap-2">
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    <Button asChild size="sm" variant={item.details_complete ? "outline" : "default"}>
+                      <Link to="/items/$id/edit" params={{ id: item.id }}>
+                        <Pencil className="mr-1 h-3 w-3" />
+                        {item.details_complete ? "Edit" : "Complete Details"}
+                      </Link>
+                    </Button>
                     <Button
                       size="sm"
                       variant="outline"
                       onClick={() => { setEditing(item.id); setEditExpiry(item.expiry_date); }}
                     >
-                      <Pencil className="mr-1 h-3 w-3" /> Edit date
+                      Quick date
                     </Button>
                     <Button size="sm" variant="ghost" onClick={() => handleDelete(item.id)}>
                       <Trash2 className="mr-1 h-3 w-3" /> Delete
@@ -133,3 +146,4 @@ function MyItemsPage() {
     </div>
   );
 }
+

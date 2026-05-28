@@ -94,7 +94,20 @@ function Dashboard() {
               return (
                 <li key={item.id} className="flex items-center gap-3 px-5 py-3">
                   <div className="min-w-0 flex-1">
-                    <div className="truncate text-sm font-medium">{item.name}</div>
+                    <div className="flex items-center gap-2">
+                      <Link
+                        to="/items/$id/edit"
+                        params={{ id: item.id }}
+                        className="truncate text-sm font-medium hover:underline"
+                      >
+                        {item.name}
+                      </Link>
+                      {!item.details_complete && (
+                        <span className="rounded-full border border-warning/30 bg-warning/10 px-1.5 py-0.5 text-[10px] text-warning-foreground">
+                          Missing details
+                        </span>
+                      )}
+                    </div>
                     <div className="text-xs text-muted-foreground">
                       {item.category} • {format(parseISO(item.expiry_date), "MMM d, yyyy")}
                     </div>
