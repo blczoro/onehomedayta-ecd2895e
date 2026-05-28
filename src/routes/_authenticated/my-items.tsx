@@ -95,6 +95,9 @@ function MyItemsPage() {
                     <p className="text-xs text-muted-foreground">{item.category}</p>
                   </div>
                   <span className={`shrink-0 rounded-full border px-2 py-0.5 text-xs ${statusStyles[status]}`}>
+                    {statusLabel[status]}
+                  </span>
+                </div>
                 <div className="mt-3 text-xs text-muted-foreground">
                   Expiry: <span className="text-foreground">{format(parseISO(item.expiry_date), "MMM d, yyyy")}</span>
                   {" • "}
@@ -135,7 +138,12 @@ function MyItemsPage() {
                     </Button>
                   </div>
                 )}
+              </div>
+            );
+          })}
+        </div>
       )}
     </div>
   );
 }
+
