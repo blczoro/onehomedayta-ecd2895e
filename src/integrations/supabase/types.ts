@@ -62,6 +62,77 @@ export type Database = {
         }
         Relationships: []
       }
+      reminders: {
+        Row: {
+          completed_at: string | null
+          created_at: string
+          ends_after_count: number | null
+          ends_on_date: string | null
+          ends_type: string
+          id: string
+          item_id: string | null
+          notes: string | null
+          notify_days_before: number
+          recurrence: string
+          recurrence_custom_days: number | null
+          reminder_date: string
+          reminder_type: string
+          snoozed_until: string | null
+          status: string
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string
+          ends_after_count?: number | null
+          ends_on_date?: string | null
+          ends_type?: string
+          id?: string
+          item_id?: string | null
+          notes?: string | null
+          notify_days_before?: number
+          recurrence?: string
+          recurrence_custom_days?: number | null
+          reminder_date: string
+          reminder_type?: string
+          snoozed_until?: string | null
+          status?: string
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string
+          ends_after_count?: number | null
+          ends_on_date?: string | null
+          ends_type?: string
+          id?: string
+          item_id?: string | null
+          notes?: string | null
+          notify_days_before?: number
+          recurrence?: string
+          recurrence_custom_days?: number | null
+          reminder_date?: string
+          reminder_type?: string
+          snoozed_until?: string | null
+          status?: string
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reminders_item_id_fkey"
+            columns: ["item_id"]
+            isOneToOne: false
+            referencedRelation: "items"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
