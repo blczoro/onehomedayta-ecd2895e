@@ -166,6 +166,48 @@ function RemindersPage() {
     enabled: !!user,
   });
 
+  const { data: items = [] } = useQuery({
+    queryKey: ["items", user?.id],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("items")
+        .select("id,name,category,expiry_date,reminder_days,notes")
+        .order("expiry_date", { ascending: true });
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!user,
+  });
+
+  const itemReminders: Reminder[] = useMemo(
+    () =>
+      items.map((it) => ({
+        id: `item:${it.id}`,
+        user_id: "__item__",
+        item_id: it.id,
+        title: it.name,
+        reminder_type: it.category,
+        reminder_date: it.expiry_date,
+        notes: it.notes,
+        notify_days_before: it.reminder_days ?? 7,
+        recurrence: "none",
+        recurrence_custom_days: null,
+        ends_type: "never",
+        ends_after_count: null,
+        ends_on_date: null,
+        status: "active",
+        snoozed_until: null,
+        completed_at: null,
+      })),
+    [items],
+  );
+
+  const allReminders = useMemo(
+    () => [...reminders, ...itemReminders],
+    [reminders, itemReminders],
+  );
+
+
   const updateMut = useMutation({
     mutationFn: async ({ id, patch }: { id: string; patch: Partial<Reminder> }) => {
       const { error } = await supabase.from("reminders").update(patch).eq("id", id);
@@ -184,8 +226,9 @@ function RemindersPage() {
 
   const today = startOfDay(new Date());
 
-  const active = reminders.filter((r) => r.status !== "completed");
-  const completed = reminders.filter((r) => r.status === "completed");
+
+  const active = allReminders.filter((r) => r.status !== "completed");
+  const completed = allReminders.filter((r) => r.status === "completed");
 
   const overdue = active.filter(
     (r) => differenceInCalendarDays(parseISO(effectiveDate(r)), today) < 0,
@@ -198,6 +241,7 @@ function RemindersPage() {
   const upcomingCount = active.filter(
     (r) => differenceInCalendarDays(parseISO(effectiveDate(r)), today) >= 0,
   ).length;
+
 
   function handleComplete(r: Reminder) {
     if (r.recurrence === "none") {
@@ -439,6 +483,11 @@ function ReminderCard({
             {isRecurring ? <Repeat className="h-3 w-3" /> : <Clock className="h-3 w-3" />}
             {recurrenceLabel(reminder)}
           </Badge>
+          {reminder.user_id === "__item__" && (
+            <Badge variant="outline" className="text-[10px]">
+              From Items
+            </Badge>
+          )}
           {reminder.snoozed_until && (
             <Badge variant="outline" className="text-[10px]">
               Snoozed
@@ -448,7 +497,8 @@ function ReminderCard({
             <span className="truncate text-xs text-muted-foreground">· {reminder.notes}</span>
           )}
         </div>
-        {reminder.status !== "completed" && (
+        {reminder.status !== "completed" && reminder.user_id !== "__item__" && (
+
           <div className="mt-3 flex flex-wrap gap-1.5">
             <Button size="sm" variant="outline" className="h-7 text-xs" onClick={() => onComplete(reminder)}>
               <Check className="h-3 w-3" />
