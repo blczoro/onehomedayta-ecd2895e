@@ -483,6 +483,11 @@ function ReminderCard({
             {isRecurring ? <Repeat className="h-3 w-3" /> : <Clock className="h-3 w-3" />}
             {recurrenceLabel(reminder)}
           </Badge>
+          {reminder.user_id === "__item__" && (
+            <Badge variant="outline" className="text-[10px]">
+              From Items
+            </Badge>
+          )}
           {reminder.snoozed_until && (
             <Badge variant="outline" className="text-[10px]">
               Snoozed
@@ -492,7 +497,8 @@ function ReminderCard({
             <span className="truncate text-xs text-muted-foreground">· {reminder.notes}</span>
           )}
         </div>
-        {reminder.status !== "completed" && (
+        {reminder.status !== "completed" && reminder.user_id !== "__item__" && (
+
           <div className="mt-3 flex flex-wrap gap-1.5">
             <Button size="sm" variant="outline" className="h-7 text-xs" onClick={() => onComplete(reminder)}>
               <Check className="h-3 w-3" />
