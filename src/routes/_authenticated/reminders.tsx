@@ -222,6 +222,8 @@ function RemindersPage() {
       if (error) throw error;
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: ["reminders"] }),
+  });
+
   const active = allReminders.filter((r) => r.status !== "completed");
   const completed = allReminders.filter((r) => r.status === "completed");
 
@@ -237,8 +239,6 @@ function RemindersPage() {
     (r) => differenceInCalendarDays(parseISO(effectiveDate(r)), today) >= 0,
   ).length;
 
-    (r) => differenceInCalendarDays(parseISO(effectiveDate(r)), today) >= 0,
-  ).length;
 
   function handleComplete(r: Reminder) {
     if (r.recurrence === "none") {
