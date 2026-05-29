@@ -166,6 +166,48 @@ function RemindersPage() {
     enabled: !!user,
   });
 
+  const { data: items = [] } = useQuery({
+    queryKey: ["items", user?.id],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("items")
+        .select("id,name,category,expiry_date,reminder_days,notes")
+        .order("expiry_date", { ascending: true });
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!user,
+  });
+
+  const itemReminders: Reminder[] = useMemo(
+    () =>
+      items.map((it) => ({
+        id: `item:${it.id}`,
+        user_id: "__item__",
+        item_id: it.id,
+        title: it.name,
+        reminder_type: it.category,
+        reminder_date: it.expiry_date,
+        notes: it.notes,
+        notify_days_before: it.reminder_days ?? 7,
+        recurrence: "none",
+        recurrence_custom_days: null,
+        ends_type: "never",
+        ends_after_count: null,
+        ends_on_date: null,
+        status: "active",
+        snoozed_until: null,
+        completed_at: null,
+      })),
+    [items],
+  );
+
+  const allReminders = useMemo(
+    () => [...reminders, ...itemReminders],
+    [reminders, itemReminders],
+  );
+
+
   const updateMut = useMutation({
     mutationFn: async ({ id, patch }: { id: string; patch: Partial<Reminder> }) => {
       const { error } = await supabase.from("reminders").update(patch).eq("id", id);
