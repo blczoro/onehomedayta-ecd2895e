@@ -222,12 +222,8 @@ function RemindersPage() {
       if (error) throw error;
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: ["reminders"] }),
-  });
-
-  const today = startOfDay(new Date());
-
-  const active = reminders.filter((r) => r.status !== "completed");
-  const completed = reminders.filter((r) => r.status === "completed");
+  const active = allReminders.filter((r) => r.status !== "completed");
+  const completed = allReminders.filter((r) => r.status === "completed");
 
   const overdue = active.filter(
     (r) => differenceInCalendarDays(parseISO(effectiveDate(r)), today) < 0,
@@ -238,6 +234,9 @@ function RemindersPage() {
   });
 
   const upcomingCount = active.filter(
+    (r) => differenceInCalendarDays(parseISO(effectiveDate(r)), today) >= 0,
+  ).length;
+
     (r) => differenceInCalendarDays(parseISO(effectiveDate(r)), today) >= 0,
   ).length;
 
