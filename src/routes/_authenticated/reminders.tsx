@@ -224,6 +224,9 @@ function RemindersPage() {
     onSuccess: () => qc.invalidateQueries({ queryKey: ["reminders"] }),
   });
 
+  const today = startOfDay(new Date());
+
+
   const active = allReminders.filter((r) => r.status !== "completed");
   const completed = allReminders.filter((r) => r.status === "completed");
 
