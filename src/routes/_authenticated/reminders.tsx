@@ -874,6 +874,7 @@ function CreateReminderDialog({
   const [endsAfter, setEndsAfter] = useState(5);
   const [endsOn, setEndsOn] = useState("");
   const [notes, setNotes] = useState("");
+  const [visibility, setVisibility] = useState<"personal" | "shared">("personal");
   const [saving, setSaving] = useState(false);
 
   const recurrencePreview = useMemo(() => {
@@ -918,6 +919,7 @@ function CreateReminderDialog({
     setEndsAfter(5);
     setEndsOn("");
     setNotes("");
+    setVisibility("personal");
   }
 
   async function save() {
@@ -938,6 +940,7 @@ function CreateReminderDialog({
       ends_after_count: endsType === "after" ? endsAfter : null,
       ends_on_date: endsType === "on_date" && endsOn ? endsOn : null,
       notes: notes.trim() || null,
+      visibility,
     });
     setSaving(false);
     if (error) {
