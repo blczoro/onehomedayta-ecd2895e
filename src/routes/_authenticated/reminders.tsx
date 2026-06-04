@@ -550,6 +550,7 @@ function RemindersPage() {
         open={modalOpen}
         onOpenChange={setModalOpen}
         userId={user?.id}
+        spaceId={spaceId}
         onCreated={() => qc.invalidateQueries({ queryKey: ["reminders"] })}
       />
 
