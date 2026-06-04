@@ -37,14 +37,25 @@ function AddItemPage() {
   const [savedId, setSavedId] = useState<string | null>(null);
 
   const { data: members = [] } = useQuery({
-    queryKey: ["space_members", currentSpace?.id],
+    queryKey: ["space_members_with_profiles", currentSpace?.id],
     queryFn: async () => {
       if (!currentSpace) return [];
-      const { data } = await supabase
+      const { data: m } = await supabase
         .from("space_members")
-        .select("user_id, profile:profiles!inner(id, display_name, email)")
+        .select("user_id, role")
         .eq("space_id", currentSpace.id);
-      return (data ?? []) as { user_id: string; profile: { id: string; display_name: string | null; email: string | null } }[];
+      const ids = (m ?? []).map((x) => x.user_id);
+      if (ids.length === 0) return [];
+      const { data: p } = await supabase
+        .from("profiles")
+        .select("id, display_name, email")
+        .in("id", ids);
+      const map = new Map((p ?? []).map((x) => [x.id, x]));
+      return (m ?? []).map((x) => ({
+        user_id: x.user_id,
+        display_name: map.get(x.user_id)?.display_name ?? null,
+        email: map.get(x.user_id)?.email ?? null,
+      }));
     },
     enabled: !!currentSpace,
   });
