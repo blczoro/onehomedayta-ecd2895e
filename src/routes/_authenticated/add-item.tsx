@@ -114,8 +114,18 @@ function AddItemPage() {
   return (
     <div className="mx-auto max-w-md">
       <div className="rounded-xl border bg-card p-6">
-        <h1 className="text-lg font-semibold">Add an item</h1>
-        <p className="mt-1 text-sm text-muted-foreground">Save it in seconds. Add more details later.</p>
+        <div className="flex items-center justify-between gap-2">
+          <h1 className="text-lg font-semibold">Add an item</h1>
+          {currentSpace && (
+            <Link to="/spaces/$id" params={{ id: currentSpace.id }} className="rounded-full border px-2 py-0.5 text-xs hover:bg-accent">
+              {currentSpace.icon} {currentSpace.name}
+            </Link>
+          )}
+        </div>
+        <p className="mt-1 text-sm text-muted-foreground">
+          Save it in seconds. Add more details later.
+          {!canEdit && " You're a viewer in this space — switch to one you can edit."}
+        </p>
 
         <form onSubmit={onSubmit} className="mt-6 space-y-4">
           <div className="space-y-2">
