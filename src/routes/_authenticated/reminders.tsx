@@ -849,11 +849,13 @@ function CreateReminderDialog({
   open,
   onOpenChange,
   userId,
+  spaceId,
   onCreated,
 }: {
   open: boolean;
   onOpenChange: (v: boolean) => void;
   userId: string | undefined;
+  spaceId: string | undefined;
   onCreated: () => void;
 }) {
   const [title, setTitle] = useState("");
