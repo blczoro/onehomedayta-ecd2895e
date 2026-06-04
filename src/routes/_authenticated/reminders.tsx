@@ -50,6 +50,10 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
+import { VisibilityBadge } from "@/components/visibility-badge";
+import { VisibilityToggle } from "@/components/visibility-toggle";
+import { ShareDialog } from "@/components/share-dialog";
+import { Users } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/reminders")({
   head: () => ({ meta: [{ title: "Reminders — Warranty Reminder" }] }),
@@ -113,6 +117,7 @@ type Reminder = {
   status: string;
   snoozed_until: string | null;
   completed_at: string | null;
+  visibility?: string;
 };
 
 type Completion = {
@@ -219,6 +224,7 @@ function RemindersPage() {
   const [historyFor, setHistoryFor] = useState<Reminder | null>(null);
   const [completedSearch, setCompletedSearch] = useState("");
   const [completedTypeFilter, setCompletedTypeFilter] = useState<string>("all");
+  const [shareFor, setShareFor] = useState<Reminder | null>(null);
 
   const { data: reminders = [] } = useQuery({
     queryKey: ["reminders", user?.id],
@@ -286,6 +292,7 @@ function RemindersPage() {
           status: "active",
           snoozed_until: null,
           completed_at: null,
+          visibility: (it as { visibility?: string }).visibility ?? "personal",
         }))
         // hide item reminders that already have a completion for that date
         .filter((r) => !completedKeys.has(`item:${r.item_id}:${r.reminder_date}`)),
@@ -479,6 +486,7 @@ function RemindersPage() {
               onSnooze={handleSnooze}
               onDelete={(id) => deleteMut.mutate(id)}
               onHistory={() => setHistoryFor(r)}
+              onShare={() => setShareFor(r)}
             />
           ))}
         </Section>
@@ -498,6 +506,7 @@ function RemindersPage() {
               onSnooze={handleSnooze}
               onDelete={(id) => deleteMut.mutate(id)}
               onHistory={() => setHistoryFor(r)}
+              onShare={() => setShareFor(r)}
             />
           ))
         )}
@@ -535,6 +544,23 @@ function RemindersPage() {
         completions={historyList}
         onClose={() => setHistoryFor(null)}
       />
+
+      {shareFor && shareFor.user_id !== "__item__" && (
+        <ShareDialog
+          open={!!shareFor}
+          onOpenChange={(v) => !v && setShareFor(null)}
+          resourceType="reminder"
+          resourceId={shareFor.id}
+        />
+      )}
+      {shareFor && shareFor.user_id === "__item__" && shareFor.item_id && (
+        <ShareDialog
+          open={!!shareFor}
+          onOpenChange={(v) => !v && setShareFor(null)}
+          resourceType="item"
+          resourceId={shareFor.item_id}
+        />
+      )}
     </div>
   );
 }
@@ -567,12 +593,14 @@ function ReminderCard({
   onSnooze,
   onDelete,
   onHistory,
+  onShare,
 }: {
   reminder: Reminder;
   onComplete: (r: Reminder) => void;
   onSnooze: (r: Reminder, days: number) => void;
   onDelete: (id: string) => void;
   onHistory: () => void;
+  onShare: () => void;
 }) {
   const today = startOfDay(new Date());
   const eff = parseISO(effectiveDate(reminder));
@@ -639,6 +667,7 @@ function ReminderCard({
               From Items
             </Badge>
           )}
+          <VisibilityBadge visibility={reminder.visibility} />
           {reminder.notes && (
             <span className="truncate text-xs text-muted-foreground">· {reminder.notes}</span>
           )}
@@ -669,6 +698,9 @@ function ReminderCard({
             )}
             <Button size="sm" variant="ghost" className="h-7 text-xs" onClick={onHistory}>
               <History className="h-3 w-3" />
+            </Button>
+            <Button size="sm" variant="ghost" className="h-7 text-xs" onClick={onShare} title="Manage sharing">
+              <Users className="h-3 w-3" />
             </Button>
             {!isItem && (
               <Button
@@ -842,6 +874,7 @@ function CreateReminderDialog({
   const [endsAfter, setEndsAfter] = useState(5);
   const [endsOn, setEndsOn] = useState("");
   const [notes, setNotes] = useState("");
+  const [visibility, setVisibility] = useState<"personal" | "shared">("personal");
   const [saving, setSaving] = useState(false);
 
   const recurrencePreview = useMemo(() => {
@@ -886,6 +919,7 @@ function CreateReminderDialog({
     setEndsAfter(5);
     setEndsOn("");
     setNotes("");
+    setVisibility("personal");
   }
 
   async function save() {
@@ -906,6 +940,7 @@ function CreateReminderDialog({
       ends_after_count: endsType === "after" ? endsAfter : null,
       ends_on_date: endsType === "on_date" && endsOn ? endsOn : null,
       notes: notes.trim() || null,
+      visibility,
     });
     setSaving(false);
     if (error) {
@@ -1052,6 +1087,18 @@ function CreateReminderDialog({
               placeholder="Optional"
               rows={2}
             />
+          </div>
+
+          <div>
+            <Label>Visibility</Label>
+            <div className="mt-1">
+              <VisibilityToggle value={visibility} onChange={setVisibility} />
+            </div>
+            <p className="mt-1 text-xs text-muted-foreground">
+              {visibility === "personal"
+                ? "Only you can see this reminder."
+                : "You can invite people after saving."}
+            </p>
           </div>
 
           <div className="rounded-md bg-muted/40 px-3 py-2 text-xs text-muted-foreground">

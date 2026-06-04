@@ -11,6 +11,7 @@ import { CATEGORIES } from "@/lib/items";
 import { toast } from "sonner";
 import { useQueryClient } from "@tanstack/react-query";
 import { CheckCircle2 } from "lucide-react";
+import { VisibilityToggle } from "@/components/visibility-toggle";
 
 export const Route = createFileRoute("/_authenticated/add-item")({
   head: () => ({ meta: [{ title: "Add Item — Warranty Reminder" }] }),
@@ -30,6 +31,7 @@ function AddItemPage() {
   const [name, setName] = useState("");
   const [category, setCategory] = useState("");
   const [expiryDate, setExpiryDate] = useState("");
+  const [visibility, setVisibility] = useState<"personal" | "shared">("personal");
   const [submitting, setSubmitting] = useState(false);
   const [savedId, setSavedId] = useState<string | null>(null);
 
@@ -50,6 +52,7 @@ function AddItemPage() {
         reminder_days: 7,
         details: {},
         details_complete: false,
+        visibility,
       })
       .select("id")
       .single();
@@ -67,10 +70,14 @@ function AddItemPage() {
             <CheckCircle2 className="h-6 w-6" />
           </div>
           <h2 className="mt-4 text-base font-semibold">Item saved successfully.</h2>
-          <p className="mt-1 text-sm text-muted-foreground">Add more details now or later.</p>
+          <p className="mt-1 text-sm text-muted-foreground">
+            {visibility === "shared"
+              ? "Add details and invite people to share this item."
+              : "Add more details now or later."}
+          </p>
           <div className="mt-5 flex flex-col gap-2 sm:flex-row sm:justify-center">
             <Button onClick={() => navigate({ to: "/items/$id/edit", params: { id: savedId } })}>
-              Add Details
+              {visibility === "shared" ? "Manage & Share" : "Add Details"}
             </Button>
             <Button variant="outline" onClick={() => navigate({ to: "/my-items" })}>
               Skip For Now
@@ -118,6 +125,18 @@ function AddItemPage() {
               onChange={(e) => setExpiryDate(e.target.value)}
               required
             />
+          </div>
+
+          <div className="space-y-2">
+            <Label>Visibility</Label>
+            <div>
+              <VisibilityToggle value={visibility} onChange={setVisibility} />
+            </div>
+            <p className="text-xs text-muted-foreground">
+              {visibility === "personal"
+                ? "Only you can see this item."
+                : "You'll be able to invite people after saving."}
+            </p>
           </div>
 
           <Button type="submit" disabled={submitting} className="w-full">
