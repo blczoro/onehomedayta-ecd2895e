@@ -27,15 +27,7 @@ function LoginPage() {
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
-    if (!loading && user) {
-      const pending = typeof window !== "undefined" ? localStorage.getItem("wr.pendingInvite") : null;
-      if (pending) {
-        localStorage.removeItem("wr.pendingInvite");
-        navigate({ to: "/invite/$token", params: { token: pending } });
-        return;
-      }
-      navigate({ to: "/dashboard" });
-    }
+    if (!loading && user) navigate({ to: "/dashboard" });
   }, [loading, user, navigate]);
 
   const onSubmit = async (e: React.FormEvent) => {

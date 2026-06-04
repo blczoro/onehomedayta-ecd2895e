@@ -1,9 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
-import { useSpaces } from "@/hooks/use-spaces";
 import {
   addDays,
   addMonths,
@@ -214,7 +213,6 @@ function advanceDate(r: Reminder): Date | null {
 
 function RemindersPage() {
   const { user } = useAuth();
-  const { currentSpace } = useSpaces();
   const qc = useQueryClient();
   const [filter, setFilter] = useState<FilterKey>("week");
   const [modalOpen, setModalOpen] = useState(false);
@@ -222,36 +220,30 @@ function RemindersPage() {
   const [completedSearch, setCompletedSearch] = useState("");
   const [completedTypeFilter, setCompletedTypeFilter] = useState<string>("all");
 
-  const spaceId = currentSpace?.id;
-
   const { data: reminders = [] } = useQuery({
-    queryKey: ["reminders", spaceId],
+    queryKey: ["reminders", user?.id],
     queryFn: async () => {
-      if (!spaceId) return [];
       const { data, error } = await supabase
         .from("reminders")
         .select("*")
-        .eq("space_id", spaceId)
         .order("reminder_date", { ascending: true });
       if (error) throw error;
       return data as Reminder[];
     },
-    enabled: !!user && !!spaceId,
+    enabled: !!user,
   });
 
   const { data: items = [] } = useQuery({
-    queryKey: ["items", spaceId],
+    queryKey: ["items", user?.id],
     queryFn: async () => {
-      if (!spaceId) return [];
       const { data, error } = await supabase
         .from("items")
         .select("id,name,category,expiry_date,reminder_days,notes")
-        .eq("space_id", spaceId)
         .order("expiry_date", { ascending: true });
       if (error) throw error;
       return data;
     },
-    enabled: !!user && !!spaceId,
+    enabled: !!user,
   });
 
   const { data: completions = [] } = useQuery({
@@ -266,21 +258,6 @@ function RemindersPage() {
     },
     enabled: !!user,
   });
-
-  // Realtime: refetch on changes to reminders/items in this space
-  useEffect(() => {
-    if (!spaceId) return;
-    const ch = supabase
-      .channel(`space-${spaceId}-data`)
-      .on("postgres_changes", { event: "*", schema: "public", table: "reminders", filter: `space_id=eq.${spaceId}` }, () => {
-        qc.invalidateQueries({ queryKey: ["reminders", spaceId] });
-      })
-      .on("postgres_changes", { event: "*", schema: "public", table: "items", filter: `space_id=eq.${spaceId}` }, () => {
-        qc.invalidateQueries({ queryKey: ["items", spaceId] });
-      })
-      .subscribe();
-    return () => { supabase.removeChannel(ch); };
-  }, [spaceId, qc]);
 
   // Set of "source_type:source_id:date" already completed (used to hide item reminders that were completed)
   const completedKeys = useMemo(() => {
@@ -550,7 +527,6 @@ function RemindersPage() {
         open={modalOpen}
         onOpenChange={setModalOpen}
         userId={user?.id}
-        spaceId={spaceId}
         onCreated={() => qc.invalidateQueries({ queryKey: ["reminders"] })}
       />
 
@@ -849,13 +825,11 @@ function CreateReminderDialog({
   open,
   onOpenChange,
   userId,
-  spaceId,
   onCreated,
 }: {
   open: boolean;
   onOpenChange: (v: boolean) => void;
   userId: string | undefined;
-  spaceId: string | undefined;
   onCreated: () => void;
 }) {
   const [title, setTitle] = useState("");
@@ -915,14 +889,13 @@ function CreateReminderDialog({
   }
 
   async function save() {
-    if (!userId || !spaceId || !title.trim() || !date) {
+    if (!userId || !title.trim() || !date) {
       toast.error("Title and date are required");
       return;
     }
     setSaving(true);
     const { error } = await supabase.from("reminders").insert({
       user_id: userId,
-      space_id: spaceId,
       title: title.trim(),
       reminder_type: type,
       reminder_date: date,
