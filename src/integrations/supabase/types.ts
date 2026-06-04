@@ -29,6 +29,7 @@ export type Database = {
           reminder_days: number
           updated_at: string
           user_id: string
+          visibility: string
         }
         Insert: {
           category: string
@@ -44,6 +45,7 @@ export type Database = {
           reminder_days?: number
           updated_at?: string
           user_id: string
+          visibility?: string
         }
         Update: {
           category?: string
@@ -59,6 +61,7 @@ export type Database = {
           reminder_days?: number
           updated_at?: string
           user_id?: string
+          visibility?: string
         }
         Relationships: []
       }
@@ -82,6 +85,7 @@ export type Database = {
           title: string
           updated_at: string
           user_id: string
+          visibility: string
         }
         Insert: {
           completed_at?: string | null
@@ -102,6 +106,7 @@ export type Database = {
           title: string
           updated_at?: string
           user_id: string
+          visibility?: string
         }
         Update: {
           completed_at?: string | null
@@ -122,6 +127,7 @@ export type Database = {
           title?: string
           updated_at?: string
           user_id?: string
+          visibility?: string
         }
         Relationships: [
           {
@@ -133,12 +139,88 @@ export type Database = {
           },
         ]
       }
+      share_invites: {
+        Row: {
+          created_at: string
+          email: string | null
+          expires_at: string | null
+          id: string
+          owner_id: string
+          resource_id: string
+          resource_type: string
+          revoked: boolean
+          role: string
+          token: string
+        }
+        Insert: {
+          created_at?: string
+          email?: string | null
+          expires_at?: string | null
+          id?: string
+          owner_id: string
+          resource_id: string
+          resource_type: string
+          revoked?: boolean
+          role?: string
+          token: string
+        }
+        Update: {
+          created_at?: string
+          email?: string | null
+          expires_at?: string | null
+          id?: string
+          owner_id?: string
+          resource_id?: string
+          resource_type?: string
+          revoked?: boolean
+          role?: string
+          token?: string
+        }
+        Relationships: []
+      }
+      shares: {
+        Row: {
+          created_at: string
+          id: string
+          member_user_id: string
+          owner_id: string
+          resource_id: string
+          resource_type: string
+          role: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          member_user_id: string
+          owner_id: string
+          resource_id: string
+          resource_type: string
+          role?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          member_user_id?: string
+          owner_id?: string
+          resource_id?: string
+          resource_type?: string
+          role?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_share_access: {
+        Args: {
+          _min_role?: string
+          _resource_id: string
+          _resource_type: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
       [_ in never]: never
