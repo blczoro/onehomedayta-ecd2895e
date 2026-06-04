@@ -915,13 +915,14 @@ function CreateReminderDialog({
   }
 
   async function save() {
-    if (!userId || !title.trim() || !date) {
+    if (!userId || !spaceId || !title.trim() || !date) {
       toast.error("Title and date are required");
       return;
     }
     setSaving(true);
     const { error } = await supabase.from("reminders").insert({
       user_id: userId,
+      space_id: spaceId,
       title: title.trim(),
       reminder_type: type,
       reminder_date: date,
