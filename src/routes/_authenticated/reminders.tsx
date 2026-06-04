@@ -1089,6 +1089,18 @@ function CreateReminderDialog({
             />
           </div>
 
+          <div>
+            <Label>Visibility</Label>
+            <div className="mt-1">
+              <VisibilityToggle value={visibility} onChange={setVisibility} />
+            </div>
+            <p className="mt-1 text-xs text-muted-foreground">
+              {visibility === "personal"
+                ? "Only you can see this reminder."
+                : "You can invite people after saving."}
+            </p>
+          </div>
+
           <div className="rounded-md bg-muted/40 px-3 py-2 text-xs text-muted-foreground">
             Notification: <span className="font-medium text-foreground">{notifyDate}</span>
           </div>
