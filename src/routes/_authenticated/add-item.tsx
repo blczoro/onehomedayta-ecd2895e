@@ -160,7 +160,24 @@ function AddItemPage() {
             />
           </div>
 
-          <Button type="submit" disabled={submitting} className="w-full">
+          {currentSpace?.is_shared && members.length > 1 && (
+            <div className="space-y-2">
+              <Label>Assign to (optional)</Label>
+              <Select value={assignedTo} onValueChange={setAssignedTo}>
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="none">Unassigned</SelectItem>
+                  {members.map((m) => (
+                    <SelectItem key={m.user_id} value={m.user_id}>
+                      {m.display_name ?? m.email ?? "Member"}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
+
+          <Button type="submit" disabled={submitting || !canEdit} className="w-full">
             {submitting ? "Saving…" : "Save Item"}
           </Button>
         </form>
