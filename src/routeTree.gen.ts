@@ -19,6 +19,7 @@ import { Route as AuthenticatedRemindersRouteImport } from './routes/_authentica
 import { Route as AuthenticatedMyItemsRouteImport } from './routes/_authenticated/my-items'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedAddItemRouteImport } from './routes/_authenticated/add-item'
+import { Route as AuthenticatedSpacesIdRouteImport } from './routes/_authenticated/spaces.$id'
 import { Route as AuthenticatedItemsIdEditRouteImport } from './routes/_authenticated/items.$id.edit'
 
 const SignupRoute = SignupRouteImport.update({
@@ -70,6 +71,11 @@ const AuthenticatedAddItemRoute = AuthenticatedAddItemRouteImport.update({
   path: '/add-item',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedSpacesIdRoute = AuthenticatedSpacesIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => AuthenticatedSpacesRoute,
+} as any)
 const AuthenticatedItemsIdEditRoute =
   AuthenticatedItemsIdEditRouteImport.update({
     id: '/items/$id/edit',
@@ -86,7 +92,8 @@ export interface FileRoutesByFullPath {
   '/my-items': typeof AuthenticatedMyItemsRoute
   '/reminders': typeof AuthenticatedRemindersRoute
   '/settings': typeof AuthenticatedSettingsRoute
-  '/spaces': typeof AuthenticatedSpacesRoute
+  '/spaces': typeof AuthenticatedSpacesRouteWithChildren
+  '/spaces/$id': typeof AuthenticatedSpacesIdRoute
   '/items/$id/edit': typeof AuthenticatedItemsIdEditRoute
 }
 export interface FileRoutesByTo {
@@ -98,7 +105,8 @@ export interface FileRoutesByTo {
   '/my-items': typeof AuthenticatedMyItemsRoute
   '/reminders': typeof AuthenticatedRemindersRoute
   '/settings': typeof AuthenticatedSettingsRoute
-  '/spaces': typeof AuthenticatedSpacesRoute
+  '/spaces': typeof AuthenticatedSpacesRouteWithChildren
+  '/spaces/$id': typeof AuthenticatedSpacesIdRoute
   '/items/$id/edit': typeof AuthenticatedItemsIdEditRoute
 }
 export interface FileRoutesById {
@@ -112,7 +120,8 @@ export interface FileRoutesById {
   '/_authenticated/my-items': typeof AuthenticatedMyItemsRoute
   '/_authenticated/reminders': typeof AuthenticatedRemindersRoute
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
-  '/_authenticated/spaces': typeof AuthenticatedSpacesRoute
+  '/_authenticated/spaces': typeof AuthenticatedSpacesRouteWithChildren
+  '/_authenticated/spaces/$id': typeof AuthenticatedSpacesIdRoute
   '/_authenticated/items/$id/edit': typeof AuthenticatedItemsIdEditRoute
 }
 export interface FileRouteTypes {
@@ -127,6 +136,7 @@ export interface FileRouteTypes {
     | '/reminders'
     | '/settings'
     | '/spaces'
+    | '/spaces/$id'
     | '/items/$id/edit'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -139,6 +149,7 @@ export interface FileRouteTypes {
     | '/reminders'
     | '/settings'
     | '/spaces'
+    | '/spaces/$id'
     | '/items/$id/edit'
   id:
     | '__root__'
@@ -152,6 +163,7 @@ export interface FileRouteTypes {
     | '/_authenticated/reminders'
     | '/_authenticated/settings'
     | '/_authenticated/spaces'
+    | '/_authenticated/spaces/$id'
     | '/_authenticated/items/$id/edit'
   fileRoutesById: FileRoutesById
 }
@@ -234,6 +246,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAddItemRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/spaces/$id': {
+      id: '/_authenticated/spaces/$id'
+      path: '/$id'
+      fullPath: '/spaces/$id'
+      preLoaderRoute: typeof AuthenticatedSpacesIdRouteImport
+      parentRoute: typeof AuthenticatedSpacesRoute
+    }
     '/_authenticated/items/$id/edit': {
       id: '/_authenticated/items/$id/edit'
       path: '/items/$id/edit'
@@ -244,13 +263,24 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface AuthenticatedSpacesRouteChildren {
+  AuthenticatedSpacesIdRoute: typeof AuthenticatedSpacesIdRoute
+}
+
+const AuthenticatedSpacesRouteChildren: AuthenticatedSpacesRouteChildren = {
+  AuthenticatedSpacesIdRoute: AuthenticatedSpacesIdRoute,
+}
+
+const AuthenticatedSpacesRouteWithChildren =
+  AuthenticatedSpacesRoute._addFileChildren(AuthenticatedSpacesRouteChildren)
+
 interface AuthenticatedRouteChildren {
   AuthenticatedAddItemRoute: typeof AuthenticatedAddItemRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedMyItemsRoute: typeof AuthenticatedMyItemsRoute
   AuthenticatedRemindersRoute: typeof AuthenticatedRemindersRoute
   AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
-  AuthenticatedSpacesRoute: typeof AuthenticatedSpacesRoute
+  AuthenticatedSpacesRoute: typeof AuthenticatedSpacesRouteWithChildren
   AuthenticatedItemsIdEditRoute: typeof AuthenticatedItemsIdEditRoute
 }
 
@@ -260,7 +290,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedMyItemsRoute: AuthenticatedMyItemsRoute,
   AuthenticatedRemindersRoute: AuthenticatedRemindersRoute,
   AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
-  AuthenticatedSpacesRoute: AuthenticatedSpacesRoute,
+  AuthenticatedSpacesRoute: AuthenticatedSpacesRouteWithChildren,
   AuthenticatedItemsIdEditRoute: AuthenticatedItemsIdEditRoute,
 }
 
