@@ -117,7 +117,7 @@ type Reminder = {
   status: string;
   snoozed_until: string | null;
   completed_at: string | null;
-  visibility?: string | null;
+  visibility?: string;
 };
 
 type Completion = {
@@ -593,12 +593,14 @@ function ReminderCard({
   onSnooze,
   onDelete,
   onHistory,
+  onShare,
 }: {
   reminder: Reminder;
   onComplete: (r: Reminder) => void;
   onSnooze: (r: Reminder, days: number) => void;
   onDelete: (id: string) => void;
   onHistory: () => void;
+  onShare: () => void;
 }) {
   const today = startOfDay(new Date());
   const eff = parseISO(effectiveDate(reminder));
@@ -665,6 +667,7 @@ function ReminderCard({
               From Items
             </Badge>
           )}
+          <VisibilityBadge visibility={reminder.visibility} />
           {reminder.notes && (
             <span className="truncate text-xs text-muted-foreground">· {reminder.notes}</span>
           )}
@@ -695,6 +698,9 @@ function ReminderCard({
             )}
             <Button size="sm" variant="ghost" className="h-7 text-xs" onClick={onHistory}>
               <History className="h-3 w-3" />
+            </Button>
+            <Button size="sm" variant="ghost" className="h-7 text-xs" onClick={onShare} title="Manage sharing">
+              <Users className="h-3 w-3" />
             </Button>
             {!isItem && (
               <Button
