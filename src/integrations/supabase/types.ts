@@ -16,6 +16,7 @@ export type Database = {
     Tables: {
       items: {
         Row: {
+          assigned_to: string | null
           category: string
           created_at: string
           details: Json
@@ -27,10 +28,12 @@ export type Database = {
           notes: string | null
           purchase_date: string | null
           reminder_days: number
+          space_id: string
           updated_at: string
           user_id: string
         }
         Insert: {
+          assigned_to?: string | null
           category: string
           created_at?: string
           details?: Json
@@ -42,10 +45,12 @@ export type Database = {
           notes?: string | null
           purchase_date?: string | null
           reminder_days?: number
+          space_id: string
           updated_at?: string
           user_id: string
         }
         Update: {
+          assigned_to?: string | null
           category?: string
           created_at?: string
           details?: Json
@@ -57,8 +62,88 @@ export type Database = {
           notes?: string | null
           purchase_date?: string | null
           reminder_days?: number
+          space_id?: string
           updated_at?: string
           user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "items_space_id_fkey"
+            columns: ["space_id"]
+            isOneToOne: false
+            referencedRelation: "spaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      notifications: {
+        Row: {
+          body: string | null
+          created_at: string
+          entity_id: string | null
+          entity_type: string | null
+          id: string
+          read_at: string | null
+          space_id: string | null
+          title: string
+          type: string
+          user_id: string
+        }
+        Insert: {
+          body?: string | null
+          created_at?: string
+          entity_id?: string | null
+          entity_type?: string | null
+          id?: string
+          read_at?: string | null
+          space_id?: string | null
+          title: string
+          type: string
+          user_id: string
+        }
+        Update: {
+          body?: string | null
+          created_at?: string
+          entity_id?: string | null
+          entity_type?: string | null
+          id?: string
+          read_at?: string | null
+          space_id?: string | null
+          title?: string
+          type?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notifications_space_id_fkey"
+            columns: ["space_id"]
+            isOneToOne: false
+            referencedRelation: "spaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          display_name: string | null
+          email: string | null
+          id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          display_name?: string | null
+          email?: string | null
+          id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          display_name?: string | null
+          email?: string | null
+          id?: string
+          updated_at?: string
         }
         Relationships: []
       }
@@ -103,6 +188,7 @@ export type Database = {
       }
       reminders: {
         Row: {
+          assigned_to: string | null
           completed_at: string | null
           created_at: string
           ends_after_count: number | null
@@ -117,12 +203,14 @@ export type Database = {
           reminder_date: string
           reminder_type: string
           snoozed_until: string | null
+          space_id: string
           status: string
           title: string
           updated_at: string
           user_id: string
         }
         Insert: {
+          assigned_to?: string | null
           completed_at?: string | null
           created_at?: string
           ends_after_count?: number | null
@@ -137,12 +225,14 @@ export type Database = {
           reminder_date: string
           reminder_type?: string
           snoozed_until?: string | null
+          space_id: string
           status?: string
           title: string
           updated_at?: string
           user_id: string
         }
         Update: {
+          assigned_to?: string | null
           completed_at?: string | null
           created_at?: string
           ends_after_count?: number | null
@@ -157,6 +247,7 @@ export type Database = {
           reminder_date?: string
           reminder_type?: string
           snoozed_until?: string | null
+          space_id?: string
           status?: string
           title?: string
           updated_at?: string
@@ -170,14 +261,217 @@ export type Database = {
             referencedRelation: "items"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "reminders_space_id_fkey"
+            columns: ["space_id"]
+            isOneToOne: false
+            referencedRelation: "spaces"
+            referencedColumns: ["id"]
+          },
         ]
+      }
+      space_activity: {
+        Row: {
+          action: string
+          actor_id: string | null
+          created_at: string
+          entity_id: string | null
+          entity_type: string | null
+          id: string
+          metadata: Json
+          space_id: string
+        }
+        Insert: {
+          action: string
+          actor_id?: string | null
+          created_at?: string
+          entity_id?: string | null
+          entity_type?: string | null
+          id?: string
+          metadata?: Json
+          space_id: string
+        }
+        Update: {
+          action?: string
+          actor_id?: string | null
+          created_at?: string
+          entity_id?: string | null
+          entity_type?: string | null
+          id?: string
+          metadata?: Json
+          space_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "space_activity_space_id_fkey"
+            columns: ["space_id"]
+            isOneToOne: false
+            referencedRelation: "spaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      space_invites: {
+        Row: {
+          created_at: string
+          created_by: string
+          email: string | null
+          expires_at: string | null
+          id: string
+          revoked_at: string | null
+          role_on_accept: string
+          space_id: string
+          token: string
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          email?: string | null
+          expires_at?: string | null
+          id?: string
+          revoked_at?: string | null
+          role_on_accept?: string
+          space_id: string
+          token: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          email?: string | null
+          expires_at?: string | null
+          id?: string
+          revoked_at?: string | null
+          role_on_accept?: string
+          space_id?: string
+          token?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "space_invites_space_id_fkey"
+            columns: ["space_id"]
+            isOneToOne: false
+            referencedRelation: "spaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      space_members: {
+        Row: {
+          created_at: string
+          id: string
+          invited_by: string | null
+          joined_at: string
+          role: string
+          space_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          invited_by?: string | null
+          joined_at?: string
+          role: string
+          space_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          invited_by?: string | null
+          joined_at?: string
+          role?: string
+          space_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "space_members_space_id_fkey"
+            columns: ["space_id"]
+            isOneToOne: false
+            referencedRelation: "spaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      spaces: {
+        Row: {
+          created_at: string
+          description: string | null
+          icon: string
+          id: string
+          is_shared: boolean
+          name: string
+          owner_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          icon?: string
+          id?: string
+          is_shared?: boolean
+          name: string
+          owner_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          icon?: string
+          id?: string
+          is_shared?: boolean
+          name?: string
+          owner_id?: string
+          updated_at?: string
+        }
+        Relationships: []
       }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      accept_space_invite: { Args: { _token: string }; Returns: string }
+      can_edit_space: {
+        Args: { _space_id: string; _user_id: string }
+        Returns: boolean
+      }
+      is_space_member: {
+        Args: { _space_id: string; _user_id: string }
+        Returns: boolean
+      }
+      is_space_owner: {
+        Args: { _space_id: string; _user_id: string }
+        Returns: boolean
+      }
+      notify_space_members: {
+        Args: {
+          _body: string
+          _entity_id: string
+          _entity_type: string
+          _exclude_user: string
+          _space_id: string
+          _title: string
+          _type: string
+        }
+        Returns: undefined
+      }
+      preview_space_invite: {
+        Args: { _token: string }
+        Returns: {
+          description: string
+          icon: string
+          is_valid: boolean
+          name: string
+          reason: string
+          role_on_accept: string
+          space_id: string
+        }[]
+      }
+      space_role: {
+        Args: { _space_id: string; _user_id: string }
+        Returns: string
+      }
     }
     Enums: {
       [_ in never]: never
