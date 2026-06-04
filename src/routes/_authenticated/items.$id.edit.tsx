@@ -15,7 +15,10 @@ import {
 } from "@/components/ui/collapsible";
 import { CATEGORIES, DETAIL_SECTIONS, REMINDER_OPTIONS, detailsCompleteness } from "@/lib/items";
 import { toast } from "sonner";
-import { ChevronDown, ArrowLeft, Trash2, Check } from "lucide-react";
+import { ChevronDown, ArrowLeft, Trash2, Check, Users } from "lucide-react";
+import { VisibilityToggle } from "@/components/visibility-toggle";
+import { VisibilityBadge } from "@/components/visibility-badge";
+import { ShareDialog } from "@/components/share-dialog";
 
 export const Route = createFileRoute("/_authenticated/items/$id/edit")({
   head: () => ({ meta: [{ title: "Edit Item — Warranty Reminder" }] }),
@@ -41,6 +44,8 @@ function EditItemPage() {
   const [expiryDate, setExpiryDate] = useState("");
   const [reminderDays, setReminderDays] = useState("7");
   const [details, setDetails] = useState<Record<string, unknown>>({});
+  const [visibility, setVisibility] = useState<"personal" | "shared">("personal");
+  const [shareOpen, setShareOpen] = useState(false);
   const [savedAt, setSavedAt] = useState<Date | null>(null);
   const initialized = useRef(false);
 
@@ -51,6 +56,7 @@ function EditItemPage() {
       setExpiryDate(item.expiry_date);
       setReminderDays(String(item.reminder_days));
       setDetails((item.details as Record<string, unknown>) ?? {});
+      setVisibility((item.visibility as "personal" | "shared") ?? "personal");
       initialized.current = true;
     }
   }, [item]);
@@ -79,6 +85,7 @@ function EditItemPage() {
           reminder_days: Number(reminderDays) || 7,
           details: details as never,
           details_complete: completeness.percent === 100,
+          visibility,
         })
         .eq("id", id);
       if (error) {
@@ -93,7 +100,7 @@ function EditItemPage() {
       if (debounce.current) clearTimeout(debounce.current);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [name, category, expiryDate, reminderDays, details]);
+  }, [name, category, expiryDate, reminderDays, details, visibility]);
 
   const updateDetail = (key: string, value: unknown) =>
     setDetails((d) => ({ ...d, [key]: value }));
@@ -154,7 +161,10 @@ function EditItemPage() {
 
       {/* Basics */}
       <div className="rounded-xl border bg-card p-5 space-y-4">
-        <h2 className="text-sm font-semibold">Basics</h2>
+        <div className="flex items-center justify-between gap-2">
+          <h2 className="text-sm font-semibold">Basics</h2>
+          <VisibilityBadge visibility={visibility} />
+        </div>
         <div className="space-y-2">
           <Label htmlFor="name">Item name</Label>
           <Input id="name" value={name} onChange={(e) => setName(e.target.value)} />
@@ -189,6 +199,23 @@ function EditItemPage() {
               ))}
             </SelectContent>
           </Select>
+        </div>
+
+        <div className="space-y-2">
+          <Label>Visibility</Label>
+          <div className="flex flex-wrap items-center gap-2">
+            <VisibilityToggle value={visibility} onChange={setVisibility} />
+            {visibility === "shared" && (
+              <Button size="sm" variant="outline" onClick={() => setShareOpen(true)}>
+                <Users className="mr-1 h-3.5 w-3.5" /> Manage sharing
+              </Button>
+            )}
+          </div>
+          <p className="text-xs text-muted-foreground">
+            {visibility === "personal"
+              ? "Only you can see this item."
+              : "Invited members can view or edit this item."}
+          </p>
         </div>
       </div>
 
@@ -264,6 +291,13 @@ function EditItemPage() {
         </Button>
         <Button onClick={() => navigate({ to: "/my-items" })}>Done</Button>
       </div>
+
+      <ShareDialog
+        open={shareOpen}
+        onOpenChange={setShareOpen}
+        resourceType="item"
+        resourceId={id}
+      />
     </div>
   );
 }
