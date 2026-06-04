@@ -10,6 +10,7 @@ import { format, parseISO } from "date-fns";
 import { Pencil, Trash2, Plus, Search, AlertCircle } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
+import { VisibilityBadge } from "@/components/visibility-badge";
 
 export const Route = createFileRoute("/_authenticated/my-items")({
   head: () => ({ meta: [{ title: "My Items — Warranty Reminder" }] }),
@@ -94,9 +95,12 @@ function MyItemsPage() {
                     <h3 className="truncate text-sm font-medium">{item.name}</h3>
                     <p className="text-xs text-muted-foreground">{item.category}</p>
                   </div>
-                  <span className={`shrink-0 rounded-full border px-2 py-0.5 text-xs ${statusStyles[status]}`}>
-                    {statusLabel[status]}
-                  </span>
+                  <div className="flex shrink-0 flex-col items-end gap-1">
+                    <span className={`rounded-full border px-2 py-0.5 text-xs ${statusStyles[status]}`}>
+                      {statusLabel[status]}
+                    </span>
+                    <VisibilityBadge visibility={item.visibility} />
+                  </div>
                 </div>
                 <div className="mt-3 text-xs text-muted-foreground">
                   Expiry: <span className="text-foreground">{format(parseISO(item.expiry_date), "MMM d, yyyy")}</span>
