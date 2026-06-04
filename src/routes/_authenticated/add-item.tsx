@@ -1,15 +1,16 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
+import { useSpaces } from "@/hooks/use-spaces";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { CATEGORIES } from "@/lib/items";
 import { toast } from "sonner";
-import { useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { CheckCircle2 } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/add-item")({
@@ -25,25 +26,54 @@ const schema = z.object({
 
 function AddItemPage() {
   const { user } = useAuth();
+  const { currentSpace, canEdit } = useSpaces();
   const navigate = useNavigate();
   const qc = useQueryClient();
   const [name, setName] = useState("");
   const [category, setCategory] = useState("");
   const [expiryDate, setExpiryDate] = useState("");
+  const [assignedTo, setAssignedTo] = useState<string>("none");
   const [submitting, setSubmitting] = useState(false);
   const [savedId, setSavedId] = useState<string | null>(null);
+
+  const { data: members = [] } = useQuery({
+    queryKey: ["space_members_with_profiles", currentSpace?.id],
+    queryFn: async () => {
+      if (!currentSpace) return [];
+      const { data: m } = await supabase
+        .from("space_members")
+        .select("user_id, role")
+        .eq("space_id", currentSpace.id);
+      const ids = (m ?? []).map((x) => x.user_id);
+      if (ids.length === 0) return [];
+      const { data: p } = await supabase
+        .from("profiles")
+        .select("id, display_name, email")
+        .in("id", ids);
+      const map = new Map((p ?? []).map((x) => [x.id, x]));
+      return (m ?? []).map((x) => ({
+        user_id: x.user_id,
+        display_name: map.get(x.user_id)?.display_name ?? null,
+        email: map.get(x.user_id)?.email ?? null,
+      }));
+    },
+    enabled: !!currentSpace,
+  });
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const parsed = schema.safeParse({ name, category, expiry_date: expiryDate });
     if (!parsed.success) return toast.error(parsed.error.issues[0].message);
-    if (!user) return;
+    if (!user || !currentSpace) return;
+    if (!canEdit) return toast.error("You don't have permission to add items in this space.");
 
     setSubmitting(true);
     const { data, error } = await supabase
       .from("items")
       .insert({
         user_id: user.id,
+        space_id: currentSpace.id,
+        assigned_to: assignedTo === "none" ? null : assignedTo,
         name: parsed.data.name,
         category: parsed.data.category,
         expiry_date: parsed.data.expiry_date,
@@ -84,8 +114,18 @@ function AddItemPage() {
   return (
     <div className="mx-auto max-w-md">
       <div className="rounded-xl border bg-card p-6">
-        <h1 className="text-lg font-semibold">Add an item</h1>
-        <p className="mt-1 text-sm text-muted-foreground">Save it in seconds. Add more details later.</p>
+        <div className="flex items-center justify-between gap-2">
+          <h1 className="text-lg font-semibold">Add an item</h1>
+          {currentSpace && (
+            <Link to="/spaces/$id" params={{ id: currentSpace.id }} className="rounded-full border px-2 py-0.5 text-xs hover:bg-accent">
+              {currentSpace.icon} {currentSpace.name}
+            </Link>
+          )}
+        </div>
+        <p className="mt-1 text-sm text-muted-foreground">
+          Save it in seconds. Add more details later.
+          {!canEdit && " You're a viewer in this space — switch to one you can edit."}
+        </p>
 
         <form onSubmit={onSubmit} className="mt-6 space-y-4">
           <div className="space-y-2">
@@ -120,7 +160,24 @@ function AddItemPage() {
             />
           </div>
 
-          <Button type="submit" disabled={submitting} className="w-full">
+          {currentSpace?.is_shared && members.length > 1 && (
+            <div className="space-y-2">
+              <Label>Assign to (optional)</Label>
+              <Select value={assignedTo} onValueChange={setAssignedTo}>
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="none">Unassigned</SelectItem>
+                  {members.map((m) => (
+                    <SelectItem key={m.user_id} value={m.user_id}>
+                      {m.display_name ?? m.email ?? "Member"}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
+
+          <Button type="submit" disabled={submitting || !canEdit} className="w-full">
             {submitting ? "Saving…" : "Save Item"}
           </Button>
         </form>

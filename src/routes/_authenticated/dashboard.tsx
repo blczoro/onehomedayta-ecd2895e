@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
+import { useSpaces } from "@/hooks/use-spaces";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { daysUntil, statusOf, statusStyles, statusLabel } from "@/lib/items";
@@ -16,19 +17,23 @@ export const Route = createFileRoute("/_authenticated/dashboard")({
 
 function Dashboard() {
   const { user } = useAuth();
+  const { currentSpace } = useSpaces();
+  const spaceId = currentSpace?.id;
   const [q, setQ] = useState("");
 
   const { data: items = [], isLoading } = useQuery({
-    queryKey: ["items", user?.id],
+    queryKey: ["items", spaceId],
     queryFn: async () => {
+      if (!spaceId) return [];
       const { data, error } = await supabase
         .from("items")
         .select("*")
+        .eq("space_id", spaceId)
         .order("expiry_date", { ascending: true });
       if (error) throw error;
       return data;
     },
-    enabled: !!user,
+    enabled: !!user && !!spaceId,
   });
 
   const total = items.length;

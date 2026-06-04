@@ -13,11 +13,14 @@ import { Route as SignupRouteImport } from './routes/signup'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as InviteTokenRouteImport } from './routes/invite.$token'
+import { Route as AuthenticatedSpacesRouteImport } from './routes/_authenticated/spaces'
 import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
 import { Route as AuthenticatedRemindersRouteImport } from './routes/_authenticated/reminders'
 import { Route as AuthenticatedMyItemsRouteImport } from './routes/_authenticated/my-items'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedAddItemRouteImport } from './routes/_authenticated/add-item'
+import { Route as AuthenticatedSpacesIdRouteImport } from './routes/_authenticated/spaces.$id'
 import { Route as AuthenticatedItemsIdEditRouteImport } from './routes/_authenticated/items.$id.edit'
 
 const SignupRoute = SignupRouteImport.update({
@@ -38,6 +41,16 @@ const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
+} as any)
+const InviteTokenRoute = InviteTokenRouteImport.update({
+  id: '/invite/$token',
+  path: '/invite/$token',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedSpacesRoute = AuthenticatedSpacesRouteImport.update({
+  id: '/spaces',
+  path: '/spaces',
+  getParentRoute: () => AuthenticatedRoute,
 } as any)
 const AuthenticatedSettingsRoute = AuthenticatedSettingsRouteImport.update({
   id: '/settings',
@@ -64,6 +77,11 @@ const AuthenticatedAddItemRoute = AuthenticatedAddItemRouteImport.update({
   path: '/add-item',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedSpacesIdRoute = AuthenticatedSpacesIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => AuthenticatedSpacesRoute,
+} as any)
 const AuthenticatedItemsIdEditRoute =
   AuthenticatedItemsIdEditRouteImport.update({
     id: '/items/$id/edit',
@@ -80,6 +98,9 @@ export interface FileRoutesByFullPath {
   '/my-items': typeof AuthenticatedMyItemsRoute
   '/reminders': typeof AuthenticatedRemindersRoute
   '/settings': typeof AuthenticatedSettingsRoute
+  '/spaces': typeof AuthenticatedSpacesRouteWithChildren
+  '/invite/$token': typeof InviteTokenRoute
+  '/spaces/$id': typeof AuthenticatedSpacesIdRoute
   '/items/$id/edit': typeof AuthenticatedItemsIdEditRoute
 }
 export interface FileRoutesByTo {
@@ -91,6 +112,9 @@ export interface FileRoutesByTo {
   '/my-items': typeof AuthenticatedMyItemsRoute
   '/reminders': typeof AuthenticatedRemindersRoute
   '/settings': typeof AuthenticatedSettingsRoute
+  '/spaces': typeof AuthenticatedSpacesRouteWithChildren
+  '/invite/$token': typeof InviteTokenRoute
+  '/spaces/$id': typeof AuthenticatedSpacesIdRoute
   '/items/$id/edit': typeof AuthenticatedItemsIdEditRoute
 }
 export interface FileRoutesById {
@@ -104,6 +128,9 @@ export interface FileRoutesById {
   '/_authenticated/my-items': typeof AuthenticatedMyItemsRoute
   '/_authenticated/reminders': typeof AuthenticatedRemindersRoute
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
+  '/_authenticated/spaces': typeof AuthenticatedSpacesRouteWithChildren
+  '/invite/$token': typeof InviteTokenRoute
+  '/_authenticated/spaces/$id': typeof AuthenticatedSpacesIdRoute
   '/_authenticated/items/$id/edit': typeof AuthenticatedItemsIdEditRoute
 }
 export interface FileRouteTypes {
@@ -117,6 +144,9 @@ export interface FileRouteTypes {
     | '/my-items'
     | '/reminders'
     | '/settings'
+    | '/spaces'
+    | '/invite/$token'
+    | '/spaces/$id'
     | '/items/$id/edit'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -128,6 +158,9 @@ export interface FileRouteTypes {
     | '/my-items'
     | '/reminders'
     | '/settings'
+    | '/spaces'
+    | '/invite/$token'
+    | '/spaces/$id'
     | '/items/$id/edit'
   id:
     | '__root__'
@@ -140,6 +173,9 @@ export interface FileRouteTypes {
     | '/_authenticated/my-items'
     | '/_authenticated/reminders'
     | '/_authenticated/settings'
+    | '/_authenticated/spaces'
+    | '/invite/$token'
+    | '/_authenticated/spaces/$id'
     | '/_authenticated/items/$id/edit'
   fileRoutesById: FileRoutesById
 }
@@ -148,6 +184,7 @@ export interface RootRouteChildren {
   AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
   LoginRoute: typeof LoginRoute
   SignupRoute: typeof SignupRoute
+  InviteTokenRoute: typeof InviteTokenRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -179,6 +216,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/invite/$token': {
+      id: '/invite/$token'
+      path: '/invite/$token'
+      fullPath: '/invite/$token'
+      preLoaderRoute: typeof InviteTokenRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/spaces': {
+      id: '/_authenticated/spaces'
+      path: '/spaces'
+      fullPath: '/spaces'
+      preLoaderRoute: typeof AuthenticatedSpacesRouteImport
+      parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/settings': {
       id: '/_authenticated/settings'
@@ -215,6 +266,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAddItemRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/spaces/$id': {
+      id: '/_authenticated/spaces/$id'
+      path: '/$id'
+      fullPath: '/spaces/$id'
+      preLoaderRoute: typeof AuthenticatedSpacesIdRouteImport
+      parentRoute: typeof AuthenticatedSpacesRoute
+    }
     '/_authenticated/items/$id/edit': {
       id: '/_authenticated/items/$id/edit'
       path: '/items/$id/edit'
@@ -225,12 +283,24 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface AuthenticatedSpacesRouteChildren {
+  AuthenticatedSpacesIdRoute: typeof AuthenticatedSpacesIdRoute
+}
+
+const AuthenticatedSpacesRouteChildren: AuthenticatedSpacesRouteChildren = {
+  AuthenticatedSpacesIdRoute: AuthenticatedSpacesIdRoute,
+}
+
+const AuthenticatedSpacesRouteWithChildren =
+  AuthenticatedSpacesRoute._addFileChildren(AuthenticatedSpacesRouteChildren)
+
 interface AuthenticatedRouteChildren {
   AuthenticatedAddItemRoute: typeof AuthenticatedAddItemRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedMyItemsRoute: typeof AuthenticatedMyItemsRoute
   AuthenticatedRemindersRoute: typeof AuthenticatedRemindersRoute
   AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
+  AuthenticatedSpacesRoute: typeof AuthenticatedSpacesRouteWithChildren
   AuthenticatedItemsIdEditRoute: typeof AuthenticatedItemsIdEditRoute
 }
 
@@ -240,6 +310,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedMyItemsRoute: AuthenticatedMyItemsRoute,
   AuthenticatedRemindersRoute: AuthenticatedRemindersRoute,
   AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
+  AuthenticatedSpacesRoute: AuthenticatedSpacesRouteWithChildren,
   AuthenticatedItemsIdEditRoute: AuthenticatedItemsIdEditRoute,
 }
 
@@ -252,17 +323,8 @@ const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
   LoginRoute: LoginRoute,
   SignupRoute: SignupRoute,
+  InviteTokenRoute: InviteTokenRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
+import { useSpaces } from "@/hooks/use-spaces";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -18,6 +19,8 @@ export const Route = createFileRoute("/_authenticated/my-items")({
 
 function MyItemsPage() {
   const { user } = useAuth();
+  const { currentSpace } = useSpaces();
+  const spaceId = currentSpace?.id;
   const qc = useQueryClient();
   const [q, setQ] = useState("");
   const [cat, setCat] = useState<string>("all");
@@ -25,14 +28,20 @@ function MyItemsPage() {
   const [editExpiry, setEditExpiry] = useState("");
 
   const { data: items = [], isLoading } = useQuery({
-    queryKey: ["items", user?.id],
+    queryKey: ["items", spaceId],
     queryFn: async () => {
-      const { data, error } = await supabase.from("items").select("*").order("expiry_date");
+      if (!spaceId) return [];
+      const { data, error } = await supabase
+        .from("items")
+        .select("*")
+        .eq("space_id", spaceId)
+        .order("expiry_date");
       if (error) throw error;
       return data;
     },
-    enabled: !!user,
+    enabled: !!user && !!spaceId,
   });
+
 
   const filtered = items.filter((i) => {
     const m = q ? i.name.toLowerCase().includes(q.toLowerCase()) : true;
