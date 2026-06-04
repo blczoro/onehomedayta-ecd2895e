@@ -62,45 +62,6 @@ export type Database = {
         }
         Relationships: []
       }
-      reminder_completions: {
-        Row: {
-          completed_at: string
-          created_at: string
-          id: string
-          original_date: string
-          recurrence: string
-          reminder_type: string
-          source_id: string
-          source_type: string
-          title: string
-          user_id: string
-        }
-        Insert: {
-          completed_at?: string
-          created_at?: string
-          id?: string
-          original_date: string
-          recurrence?: string
-          reminder_type?: string
-          source_id: string
-          source_type: string
-          title: string
-          user_id: string
-        }
-        Update: {
-          completed_at?: string
-          created_at?: string
-          id?: string
-          original_date?: string
-          recurrence?: string
-          reminder_type?: string
-          source_id?: string
-          source_type?: string
-          title?: string
-          user_id?: string
-        }
-        Relationships: []
-      }
       reminders: {
         Row: {
           completed_at: string | null
