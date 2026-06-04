@@ -1,15 +1,16 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
+import { useSpaces } from "@/hooks/use-spaces";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { CATEGORIES } from "@/lib/items";
 import { toast } from "sonner";
-import { useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { CheckCircle2 } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/add-item")({
@@ -25,25 +26,43 @@ const schema = z.object({
 
 function AddItemPage() {
   const { user } = useAuth();
+  const { currentSpace, canEdit } = useSpaces();
   const navigate = useNavigate();
   const qc = useQueryClient();
   const [name, setName] = useState("");
   const [category, setCategory] = useState("");
   const [expiryDate, setExpiryDate] = useState("");
+  const [assignedTo, setAssignedTo] = useState<string>("none");
   const [submitting, setSubmitting] = useState(false);
   const [savedId, setSavedId] = useState<string | null>(null);
+
+  const { data: members = [] } = useQuery({
+    queryKey: ["space_members", currentSpace?.id],
+    queryFn: async () => {
+      if (!currentSpace) return [];
+      const { data } = await supabase
+        .from("space_members")
+        .select("user_id, profile:profiles!inner(id, display_name, email)")
+        .eq("space_id", currentSpace.id);
+      return (data ?? []) as { user_id: string; profile: { id: string; display_name: string | null; email: string | null } }[];
+    },
+    enabled: !!currentSpace,
+  });
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const parsed = schema.safeParse({ name, category, expiry_date: expiryDate });
     if (!parsed.success) return toast.error(parsed.error.issues[0].message);
-    if (!user) return;
+    if (!user || !currentSpace) return;
+    if (!canEdit) return toast.error("You don't have permission to add items in this space.");
 
     setSubmitting(true);
     const { data, error } = await supabase
       .from("items")
       .insert({
         user_id: user.id,
+        space_id: currentSpace.id,
+        assigned_to: assignedTo === "none" ? null : assignedTo,
         name: parsed.data.name,
         category: parsed.data.category,
         expiry_date: parsed.data.expiry_date,
