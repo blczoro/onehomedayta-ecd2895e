@@ -1,4 +1,4 @@
-import { useEffect, useQuery as _unused } from "react";
+import { useEffect } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
@@ -208,14 +208,19 @@ function DocumentCard({
   const [thumb, setThumb] = useState<string | null>(null);
 
   // Lazy load thumbnail for images
-  useState(() => {
-    if (isImage) {
-      supabase.storage
-        .from("documents")
-        .createSignedUrl(doc.storage_path, 60 * 10)
-        .then(({ data }) => data && setThumb(data.signedUrl));
-    }
-  });
+  useEffect(() => {
+    if (!isImage) return;
+    let alive = true;
+    supabase.storage
+      .from("documents")
+      .createSignedUrl(doc.storage_path, 60 * 10)
+      .then(({ data }) => {
+        if (alive && data) setThumb(data.signedUrl);
+      });
+    return () => {
+      alive = false;
+    };
+  }, [isImage, doc.storage_path]);
 
   return (
     <li className="flex flex-col rounded-lg border bg-background p-3">
