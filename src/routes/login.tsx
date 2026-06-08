@@ -8,9 +8,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Bell } from "lucide-react";
 import { toast } from "sonner";
+import { BrandLogo } from "@/components/brand-logo";
 
 export const Route = createFileRoute("/login")({
-  head: () => ({ meta: [{ title: "Login — Warranty Reminder" }] }),
+  head: () => ({ meta: [{ title: "Login — One Home" }] }),
   component: LoginPage,
 });
 
@@ -50,7 +51,7 @@ function LoginPage() {
       <div className="w-full max-w-sm">
         <Link to="/" className="mb-8 flex items-center justify-center gap-2 font-semibold">
           <Bell className="h-5 w-5 text-primary" />
-          Warranty Reminder
+          <BrandLogo size="md" />
         </Link>
         <div className="rounded-xl border bg-card p-6 shadow-sm">
           <h1 className="text-xl font-semibold">Log in</h1>

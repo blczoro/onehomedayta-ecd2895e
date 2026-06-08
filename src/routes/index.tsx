@@ -3,15 +3,16 @@ import { useEffect } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { Bell, Shield, Calendar, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { BrandLogo } from "@/components/brand-logo";
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Warranty Reminder — Track warranties, renewals & expiries" },
+      { title: "One Home — Your personal data organizer" },
       {
         name: "description",
         content:
-          "Save warranty dates, insurance renewals, and important expiries — never miss a deadline.",
+          "Organize your applications, warranties, renewals, reminders, and documents in one place.",
       },
     ],
   }),
@@ -32,7 +33,7 @@ function Index() {
         <div className="mx-auto flex max-w-5xl items-center justify-between px-6 py-4">
           <div className="flex items-center gap-2 font-semibold">
             <Bell className="h-5 w-5 text-primary" />
-            <span>Warranty Reminder</span>
+            <BrandLogo size="md" />
           </div>
           <nav className="flex items-center gap-2">
             <Button asChild variant="ghost" size="sm">
@@ -47,11 +48,10 @@ function Index() {
 
       <main className="mx-auto max-w-3xl px-6 py-20 text-center">
         <h1 className="text-4xl font-semibold tracking-tight sm:text-5xl">
-          Never miss an expiry date again.
+          Your personal data, organized.
         </h1>
         <p className="mt-5 text-base text-muted-foreground sm:text-lg">
-          This website helps users remember warranty dates, insurance renewals, and important
-          expiry reminders.
+          One Home keeps your applications, warranties, renewals, documents, and reminders in one private place.
         </p>
         <div className="mt-8 flex flex-wrap justify-center gap-3">
           <Button asChild size="lg">

@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Loader2, CheckCircle2, AlertTriangle, Users } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/invite/$token")({
-  head: () => ({ meta: [{ title: "Accept invite — Warranty Reminder" }] }),
+  head: () => ({ meta: [{ title: "Accept invite — One Home" }] }),
   component: AcceptInvitePage,
 });
 

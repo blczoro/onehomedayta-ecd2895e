@@ -14,7 +14,7 @@ import { CheckCircle2 } from "lucide-react";
 import { VisibilityToggle } from "@/components/visibility-toggle";
 
 export const Route = createFileRoute("/_authenticated/add-item")({
-  head: () => ({ meta: [{ title: "Add Item — Warranty Reminder" }] }),
+  head: () => ({ meta: [{ title: "Add Application — One Home" }] }),
   component: AddItemPage,
 });
 
@@ -69,10 +69,10 @@ function AddItemPage() {
           <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-success/10 text-success">
             <CheckCircle2 className="h-6 w-6" />
           </div>
-          <h2 className="mt-4 text-base font-semibold">Item saved successfully.</h2>
+          <h2 className="mt-4 text-base font-semibold">Application saved successfully.</h2>
           <p className="mt-1 text-sm text-muted-foreground">
             {visibility === "shared"
-              ? "Add details and invite people to share this item."
+              ? "Add details and invite people to share this application."
               : "Add more details now or later."}
           </p>
           <div className="mt-5 flex flex-col gap-2 sm:flex-row sm:justify-center">
@@ -91,12 +91,12 @@ function AddItemPage() {
   return (
     <div className="mx-auto max-w-md">
       <div className="rounded-xl border bg-card p-6">
-        <h1 className="text-lg font-semibold">Add an item</h1>
+        <h1 className="text-lg font-semibold">Add an application</h1>
         <p className="mt-1 text-sm text-muted-foreground">Save it in seconds. Add more details later.</p>
 
         <form onSubmit={onSubmit} className="mt-6 space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="name">Item name</Label>
+            <Label htmlFor="name">Application name</Label>
             <Input
               id="name"
               value={name}
@@ -134,13 +134,13 @@ function AddItemPage() {
             </div>
             <p className="text-xs text-muted-foreground">
               {visibility === "personal"
-                ? "Only you can see this item."
+                ? "Only you can see this application."
                 : "You'll be able to invite people after saving."}
             </p>
           </div>
 
           <Button type="submit" disabled={submitting} className="w-full">
-            {submitting ? "Saving…" : "Save Item"}
+            {submitting ? "Saving…" : "Save Application"}
           </Button>
         </form>
       </div>

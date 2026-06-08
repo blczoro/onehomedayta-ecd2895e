@@ -16,6 +16,7 @@ import {
   SidebarFooter,
 } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
+import { BrandLogo } from "@/components/brand-logo";
 
 export const Route = createFileRoute("/_authenticated")({
   component: AuthLayout,
@@ -24,7 +25,7 @@ export const Route = createFileRoute("/_authenticated")({
 const items = [
   { title: "Dashboard", url: "/dashboard", icon: LayoutDashboard },
   { title: "Add Item", url: "/add-item", icon: Plus },
-  { title: "My Items", url: "/my-items", icon: List },
+  { title: "My Applications", url: "/my-items", icon: List },
   { title: "Reminders", url: "/reminders", icon: BellRing },
   { title: "Settings", url: "/settings", icon: Settings },
 ] as const;
@@ -52,8 +53,10 @@ function AuthLayout() {
         <Sidebar collapsible="icon">
           <SidebarHeader className="px-4 py-4">
             <div className="flex items-center gap-2 font-semibold">
-              <Bell className="h-5 w-5 text-primary" />
-              <span className="group-data-[collapsible=icon]:hidden">Warranty Reminder</span>
+              <Bell className="h-5 w-5 text-primary shrink-0" />
+              <span className="group-data-[collapsible=icon]:hidden">
+                <BrandLogo size="md" />
+              </span>
             </div>
           </SidebarHeader>
           <SidebarContent>

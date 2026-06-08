@@ -56,7 +56,7 @@ import { ShareDialog } from "@/components/share-dialog";
 import { Users } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/reminders")({
-  head: () => ({ meta: [{ title: "Reminders — Warranty Reminder" }] }),
+  head: () => ({ meta: [{ title: "Reminders — One Home" }] }),
   component: RemindersPage,
 });
 
