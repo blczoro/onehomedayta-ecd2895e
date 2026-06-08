@@ -10,7 +10,7 @@ import { useState } from "react";
 import { format, parseISO } from "date-fns";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
-  head: () => ({ meta: [{ title: "Dashboard — Warranty Reminder" }] }),
+  head: () => ({ meta: [{ title: "Dashboard — One Home" }] }),
   component: Dashboard,
 });
 
@@ -43,7 +43,7 @@ function Dashboard() {
   );
 
   const stats = [
-    { label: "Total items", value: total, icon: Package },
+    { label: "Total applications", value: total, icon: Package },
     { label: "Upcoming (30 days)", value: upcoming, icon: Clock },
     { label: "Expired", value: expired, icon: AlertCircle },
   ];
@@ -53,10 +53,10 @@ function Dashboard() {
       <div className="flex flex-wrap items-center gap-3">
         <div className="relative flex-1 min-w-[200px]">
           <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-          <Input placeholder="Search items…" value={q} onChange={(e) => setQ(e.target.value)} className="pl-9" />
+          <Input placeholder="Search applications…" value={q} onChange={(e) => setQ(e.target.value)} className="pl-9" />
         </div>
         <Button asChild>
-          <Link to="/add-item"><Plus className="mr-1 h-4 w-4" /> Add Item</Link>
+          <Link to="/add-item"><Plus className="mr-1 h-4 w-4" /> Add Application</Link>
         </Button>
       </div>
 
@@ -74,16 +74,16 @@ function Dashboard() {
 
       <div className="rounded-xl border bg-card">
         <div className="flex items-center justify-between border-b px-5 py-3">
-          <h2 className="text-sm font-medium">Recent items</h2>
+          <h2 className="text-sm font-medium">Recent applications</h2>
           <Link to="/my-items" className="text-xs text-primary hover:underline">View all</Link>
         </div>
         {isLoading ? (
           <div className="p-8 text-center text-sm text-muted-foreground">Loading…</div>
         ) : filtered.length === 0 ? (
           <div className="p-10 text-center">
-            <p className="text-sm text-muted-foreground">No items yet.</p>
+            <p className="text-sm text-muted-foreground">No applications yet.</p>
             <Button asChild size="sm" className="mt-4">
-              <Link to="/add-item">Add your first item</Link>
+              <Link to="/add-item">Add your first application</Link>
             </Button>
           </div>
         ) : (

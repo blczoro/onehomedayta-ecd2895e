@@ -19,9 +19,10 @@ import { ChevronDown, ArrowLeft, Trash2, Check, Users } from "lucide-react";
 import { VisibilityToggle } from "@/components/visibility-toggle";
 import { VisibilityBadge } from "@/components/visibility-badge";
 import { ShareDialog } from "@/components/share-dialog";
+import { DocumentList } from "@/components/document-list";
 
 export const Route = createFileRoute("/_authenticated/items/$id/edit")({
-  head: () => ({ meta: [{ title: "Edit Item — Warranty Reminder" }] }),
+  head: () => ({ meta: [{ title: "Edit Application — One Home" }] }),
   component: EditItemPage,
 });
 
@@ -106,7 +107,7 @@ function EditItemPage() {
     setDetails((d) => ({ ...d, [key]: value }));
 
   const handleDelete = async () => {
-    if (!confirm("Delete this item?")) return;
+    if (!confirm("Delete this application?")) return;
     const { error } = await supabase.from("items").delete().eq("id", id);
     if (error) return toast.error(error.message);
     toast.success("Deleted");
@@ -120,9 +121,9 @@ function EditItemPage() {
   if (!item) {
     return (
       <div className="mx-auto max-w-md rounded-xl border bg-card p-6 text-center">
-        <p className="text-sm text-muted-foreground">Item not found.</p>
+        <p className="text-sm text-muted-foreground">Application not found.</p>
         <Button asChild variant="outline" size="sm" className="mt-4">
-          <Link to="/my-items">Back to items</Link>
+          <Link to="/my-items">Back to applications</Link>
         </Button>
       </div>
     );
@@ -166,7 +167,7 @@ function EditItemPage() {
           <VisibilityBadge visibility={visibility} />
         </div>
         <div className="space-y-2">
-          <Label htmlFor="name">Item name</Label>
+          <Label htmlFor="name">Application name</Label>
           <Input id="name" value={name} onChange={(e) => setName(e.target.value)} />
         </div>
         <div className="grid gap-4 sm:grid-cols-2">
@@ -213,11 +214,13 @@ function EditItemPage() {
           </div>
           <p className="text-xs text-muted-foreground">
             {visibility === "personal"
-              ? "Only you can see this item."
-              : "Invited members can view or edit this item."}
+              ? "Only you can see this application."
+              : "Invited members can view or edit this application."}
           </p>
         </div>
       </div>
+
+      <DocumentList itemId={id} />
 
       {/* Category sections */}
       {sections.map((section, idx) => (
@@ -287,7 +290,7 @@ function EditItemPage() {
 
       <div className="flex justify-between pt-2">
         <Button variant="ghost" onClick={handleDelete} className="text-destructive hover:text-destructive">
-          <Trash2 className="mr-1 h-4 w-4" /> Delete item
+          <Trash2 className="mr-1 h-4 w-4" /> Delete application
         </Button>
         <Button onClick={() => navigate({ to: "/my-items" })}>Done</Button>
       </div>

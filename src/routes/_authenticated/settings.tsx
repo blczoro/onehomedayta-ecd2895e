@@ -8,9 +8,11 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
+import { ExportMenu } from "@/components/export-menu";
+import { BackupPanel } from "@/components/backup-panel";
 
 export const Route = createFileRoute("/_authenticated/settings")({
-  head: () => ({ meta: [{ title: "Settings — Warranty Reminder" }] }),
+  head: () => ({ meta: [{ title: "Settings — One Home" }] }),
   component: SettingsPage,
 });
 
@@ -68,6 +70,20 @@ function SettingsPage() {
           <Switch checked={theme === "dark"} onCheckedChange={toggle} />
         </div>
       </section>
+
+      <section className="rounded-xl border bg-card p-6">
+        <div className="flex items-start justify-between gap-3">
+          <div>
+            <h2 className="text-sm font-medium">Export data</h2>
+            <p className="mt-1 text-xs text-muted-foreground">
+              Download your applications, reminders, and document metadata as JSON, CSV, or Excel.
+            </p>
+          </div>
+          <ExportMenu />
+        </div>
+      </section>
+
+      <BackupPanel />
 
       <section className="rounded-xl border bg-card p-6">
         <Button variant="outline" onClick={() => signOut().then(() => navigate({ to: "/" }))}>
