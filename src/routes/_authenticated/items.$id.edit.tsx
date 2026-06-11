@@ -288,6 +288,18 @@ function EditItemPage() {
         </Collapsible>
       ))}
 
+      {/* Notes */}
+      <div className="rounded-xl border bg-card p-5 space-y-2">
+        <Label htmlFor="notes">Notes</Label>
+        <Textarea
+          id="notes"
+          rows={4}
+          value={String(details["notes"] ?? "")}
+          onChange={(e) => updateDetail("notes", e.target.value)}
+          placeholder="Add any extra details here…"
+        />
+      </div>
+
       <div className="flex justify-between pt-2">
         <Button variant="ghost" onClick={handleDelete} className="text-destructive hover:text-destructive">
           <Trash2 className="mr-1 h-4 w-4" /> Delete application
