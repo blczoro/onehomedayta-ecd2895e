@@ -77,13 +77,6 @@ export const DETAIL_SECTIONS: Record<string, DetailSection[]> = {
         { key: "seller", label: "Seller / store name", type: "text" },
       ],
     },
-    {
-      title: "Documents & notes",
-      fields: [
-        { key: "invoice", label: "Invoice upload", type: "file" },
-        { key: "notes", label: "Notes", type: "textarea" },
-      ],
-    },
   ],
   Furniture: [
     {
@@ -95,11 +88,9 @@ export const DETAIL_SECTIONS: Record<string, DetailSection[]> = {
       ],
     },
     {
-      title: "Warranty & documents",
+      title: "Warranty",
       fields: [
         { key: "warranty_details", label: "Warranty details", type: "textarea" },
-        { key: "invoice", label: "Invoice upload", type: "file" },
-        { key: "notes", label: "Notes", type: "textarea" },
       ],
     },
   ],
@@ -113,13 +104,6 @@ export const DETAIL_SECTIONS: Record<string, DetailSection[]> = {
         { key: "renewal_date", label: "Renewal date", type: "date" },
       ],
     },
-    {
-      title: "Documents",
-      fields: [
-        { key: "policy_document", label: "Policy document upload", type: "file" },
-        { key: "notes", label: "Notes", type: "textarea" },
-      ],
-    },
   ],
   Vehicle: [
     {
@@ -129,14 +113,6 @@ export const DETAIL_SECTIONS: Record<string, DetailSection[]> = {
         { key: "insurance_expiry", label: "Insurance expiry", type: "date" },
         { key: "puc_expiry", label: "PUC expiry", type: "date" },
         { key: "service_date", label: "Service reminder date", type: "date" },
-      ],
-    },
-    {
-      title: "Documents",
-      fields: [
-        { key: "rc", label: "RC upload", type: "file" },
-        { key: "insurance_document", label: "Insurance document upload", type: "file" },
-        { key: "notes", label: "Notes", type: "textarea" },
       ],
     },
   ],
@@ -162,22 +138,8 @@ export const DETAIL_SECTIONS: Record<string, DetailSection[]> = {
         { key: "seller", label: "Seller / store", type: "text" },
       ],
     },
-    {
-      title: "Documents & notes",
-      fields: [
-        { key: "invoice", label: "Invoice upload", type: "file" },
-        { key: "notes", label: "Notes", type: "textarea" },
-      ],
-    },
   ],
-  Other: [
-    {
-      title: "Details",
-      fields: [
-        { key: "notes", label: "Notes", type: "textarea" },
-      ],
-    },
-  ],
+  Other: [],
 };
 
 export function detailsCompleteness(
