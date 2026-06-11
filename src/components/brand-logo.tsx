@@ -9,9 +9,9 @@ interface BrandLogoProps {
 }
 
 const SIZES = {
-  sm: { title: "text-sm", sub: "text-[9px]", gap: "ml-1" },
-  md: { title: "text-base", sub: "text-[10px]", gap: "ml-1" },
-  lg: { title: "text-2xl", sub: "text-xs", gap: "ml-1.5" },
+  sm: { title: "text-sm", sub: "text-[9px]" },
+  md: { title: "text-base", sub: "text-[10px]" },
+  lg: { title: "text-2xl", sub: "text-xs" },
 } as const;
 
 export function BrandLogo({ className, size = "md", hideSubtitle }: BrandLogoProps) {
