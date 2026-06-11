@@ -17,15 +17,14 @@ const SIZES = {
 export function BrandLogo({ className, size = "md", hideSubtitle }: BrandLogoProps) {
   const s = SIZES[size];
   return (
-    <span className={cn("inline-flex items-end leading-none", className)}>
+    <span className={cn("inline-flex flex-col items-start leading-none", className)}>
       <span className={cn("font-semibold tracking-tight", s.title)}>One Home</span>
       {!hideSubtitle && (
         <span
           className={cn(
-            "font-medium lowercase tracking-wide text-muted-foreground",
+            "font-medium lowercase tracking-wide text-muted-foreground opacity-70",
             s.sub,
-            s.gap,
-            "relative top-[2px]",
+            "mt-[2px]",
           )}
         >
           dayta
